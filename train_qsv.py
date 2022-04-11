@@ -400,7 +400,7 @@ test_dataset = dataset(test_path, root_dir, 'test_data',test_transform)
 
 
 
-train_loader =  DataLoader(train_dataset, batch_size = 8, shuffle=True)
-test_loader =  DataLoader(test_dataset, batch_size = 8, shuffle=True)
+train_loader =  DataLoader(train_dataset, batch_size = 199, shuffle=True)
+test_loader =  DataLoader(test_dataset, batch_size = 199, shuffle=True)
 
-run(train_dataset,test_dataset,epochs=1)
+run(train_dataset,test_dataset,epochs=25)
