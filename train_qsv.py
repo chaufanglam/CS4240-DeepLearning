@@ -330,7 +330,7 @@ def test(test_loader, model, criterion, device):
     return avg_loss / len(test_loader), count_relevance
 
 
-def run(train_dataset,test_dataset,epochs =1):
+def run(train_dataset, val_dataset, train_loader, val_loader, epochs=5):
     """
 
 
@@ -347,11 +347,13 @@ def run(train_dataset,test_dataset,epochs =1):
     # Create loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model_qvs.parameters(), 0.0001)
+    #     optimizer = Over9000(model_qvs.parameters(), lr=1e-4)
 
     # Use GPU if available
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     model_qvs = model_qvs.to(device)
+    #     early_stopping = EarlyStopping(patience=10 ,verbose=True)
 
     for epoch in tqdm(range(epochs)):
         # Train on data
@@ -362,32 +364,37 @@ def run(train_dataset,test_dataset,epochs =1):
                                         device)
 
         # Test on data
-        test_loss, test_count = test(test_loader,
-                                     model_qvs,
-                                     criterion,
-                                     device)
+        val_loss, val_count = test(val_loader,
+                                   model_qvs,
+                                   criterion,
+                                   device)
 
-        train_acc_relevance = (float(train_count) / len(train_dataset))
-        test_acc_relevance = (float(test_count) / len(test_dataset) )
+        train_acc_relevance = (float(train_count) / (len(train_dataset)))
+        val_acc_relevance = (float(val_count) / (len(val_dataset)))
 
-        # Write metrics to Tensorboard
-        print("Train loss: ", train_loss, "Test loss: ", test_loss)
-        print("Train acc: ", train_acc_relevance, "Test acc: ", test_acc_relevance)
+        print("Train loss: ", train_loss, "Valiation loss: ", val_loss)
+        print("Train acc: ", train_acc_relevance, "Valiation acc: ", val_acc_relevance)
         # Write metrics to Tensorboard
         writer.add_scalars('Loss', {
             'Train': train_loss,
-            'Test': test_loss
+            'Valiation': val_loss
         }, epoch)
         writer.add_scalars('Accuracy', {
             'Train': train_acc_relevance,
-            'Test': test_acc_relevance
+            'Valiation': val_acc_relevance
         }, epoch)
+    #         early_stopping(val_loss, model_qvs)
 
-    # torch.save(model_qvs, "models")
+    #         if early_stopping.early_stop:
+    #             print("Early stopping")
+    #             break
+
+    #     torch.save(model_qvs, "models")
 
     print('\nFinished.')
     writer.flush()
     writer.close()
+    return model_qvs
 
 train_path = "annotations/query_frame_annotations_train_major.csv"
 test_path = "annotations/query_frame_annotations_test_major.csv"
@@ -403,4 +410,10 @@ test_dataset = dataset(test_path, root_dir, 'test_data',test_transform)
 train_loader =  DataLoader(train_dataset, batch_size = 199, shuffle=True)
 test_loader =  DataLoader(test_dataset, batch_size = 199, shuffle=True)
 
-run(train_dataset,test_dataset,epochs=25)
+model_qvs = run(train_dataset, val_dataset,train_loader, val_loader,epochs=5)
+
+criterion = nn.CrossEntropyLoss()
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+test_loss, test_count = test(test_loader,model_qvs,criterion,device)
+test_acc_relevance = (float(test_count) / (len(test_dataset)))
+print(test_acc_relevance)
