@@ -403,14 +403,13 @@ root_dir = "https://data.vision.ee.ethz.ch/arunv/AMT_VideoFrames/"
 
 train_dataset = dataset(train_path, root_dir,'train_data', train_transform)
 test_dataset = dataset(test_path, root_dir, 'test_data',test_transform)
-# val_dataset = dataset(val_path, root_dir, valid_transform)
-
-
+val_dataset = dataset(val_path, root_dir, 'val_data', valid_transform)
 
 train_loader =  DataLoader(train_dataset, batch_size = 199, shuffle=True)
 test_loader =  DataLoader(test_dataset, batch_size = 199, shuffle=True)
+val_loader =  DataLoader(val_dataset, batch_size = 199, shuffle=True)
 
-model_qvs = run(train_dataset, val_dataset,train_loader, val_loader,epochs=5)
+model_qvs = run(train_dataset, val_dataset, train_loader, val_loader, epochs=5)
 
 criterion = nn.CrossEntropyLoss()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
