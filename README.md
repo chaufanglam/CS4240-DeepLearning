@@ -183,7 +183,7 @@ We use Google Cloud Platform to set up a virtual machine, and we use 1 x NVIDIA 
 
 We first took the majority rule on the data and trained the model for 25 epochs. The change in the accuracy of the training set and the accuracy of the validation set is shown in the figure below, which shows the same pattern as the change of the accuracy in the paper. When the number of epoch increases, the training accuracy keeps improving, while the validation set accuracy even decreases slightly, and the model appears to be overfitting. At the same time, the accuracy of the validation set is small compared to the accuracy in the paper, only about 0.45.
 
-
+![1649964191180](figures\model_performance.png)
 
 Comparing the results of Fig1 to Figure 5 from the paper, we see that our model converges to the final result in less epochs compared to the original paper. This is beneficial, as it allows us to get a good result in less epochs. However, looking at the final results, we see a slightly larger difference between the accuracy of the training and validation data. This indicates that our model slightly overfits when compared to the original paper.
 
