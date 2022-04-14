@@ -197,6 +197,7 @@ class QVSmodel(nn.Module):
         self.model = resnet34(pretrained='imagenet')
         self.model = models.resnet34(pretrained=True)
         self.fc1 = torch.nn.Linear(512, 4)
+        self.fc2 = torch.nn.Linear(512 * 2, 4)
 
         self.fc_text1 = torch.nn.Linear(8, 1)
         self.fc_text2 = torch.nn.Linear(100, 512)
@@ -229,7 +230,10 @@ class QVSmodel(nn.Module):
         # t1 = torch.cat((x, y), 1)
 
         # Computes the second fully connected layer
-        relevance_class_prediction = self.fc1(t1)
+        # relevance_class_prediction = self.fc1(t1)
+
+        # for concatenation
+        relevance_class_prediction = self.fc2(t1)
 
         return relevance_class_prediction
 
