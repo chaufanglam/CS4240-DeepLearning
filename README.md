@@ -238,8 +238,8 @@ Although this project was challenging, the experience allowed us to further unde
 ## Contributions
 Our workflow consisted of meetings where we would discuss and try to address our biggest tasks for that week. Each person was also responsible for certain individual contributions, in particular:
  - Angelos worked on understanding the data formatting, exploring new annotated data, and translating them so they work with the algorithm.
- - 
- Bingxiang worked on preprocessing the data, training the model and the fearture fusion module. 
+ - Bingxiang worked on preprocessing the data, training the model and the fearture fusion module. 
+ - Chaufang worked on reproducing query embedding and training model on Google Cloud Platform.
 
 
 ## Reference
