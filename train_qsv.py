@@ -131,7 +131,6 @@ class dataset(Dataset):
 
 
 import gensim
-from t2i import T2I
 from nltk.tokenize import word_tokenize
 # import nltk
 # # nltk.data.path.append("F:/Anaconda/Lib/site-packages/nltk_data")
@@ -146,7 +145,6 @@ def embedding_model():
     queries_train = pd.read_csv('query-VS/dataset/videos/video_name_train.csv', engine='python')
     queries_val = pd.read_csv('query-VS/dataset/videos/video_name_val.csv', engine='python')
 
-
     # Stack train/val/test queries together
     df_queries = pd.concat([queries_train, queries_val, queries_test], axis=0)
     queries = df_queries.values.tolist()
@@ -154,14 +152,9 @@ def embedding_model():
     # Tokenize
     token = [word_tokenize(q[0]) for q in queries]
 
-    # Build the dictionary
-    word_index = T2I.build(token)
-
     # Build word2vec model
     model = gensim.models.Word2Vec(token, min_count=1)
     print(model)
-    # summarize vocabulary
-    words = list(model.wv.key_to_index)
     return model
 
 
@@ -228,7 +221,12 @@ class QVSmodel(nn.Module):
         y = F.relu(self.fc_text2(y))
 
         # Combine x and y by element-wise multiplication. The output dimension is still (1, 512).
-        t1 = torch.mul(x, y)
+        # multilication
+        # t1 = torch.mul(x, y)
+        # summation
+        t1 = x + y
+        # concatenation
+        # t1 = torch.cat((x, y), 1)
 
         # Computes the second fully connected layer
         relevance_class_prediction = self.fc1(t1)
