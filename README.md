@@ -6,7 +6,7 @@ Bingxiang Zhong (5449014) B.Zhong@student.tudelt.nl
 
 Chaufang Lin (5466091) Z.Lin-7@student.tudelft.nl
 
-Angelos Zoumis 
+Angelos Zoumis (4921771) A.Zoumis@student.tudelft.nl
 
 ## Introduction
 
