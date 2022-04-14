@@ -94,7 +94,7 @@ def encode_queries(queries, model):
 
 ### Video summary generator
 
-![1649944158854](C:\Users\zhong201707030308\AppData\Roaming\Typora\typora-user-images\1649944158854.png)
+![1649944158854](figures/model.jpeg)
 
 						Figure 3 The structure of the video summary generator.
 
@@ -197,7 +197,7 @@ We first process the relevance scores of the data with the majority rule, and tr
 
 There is a certain gap between this accuracy and the original paper. The accuracy of the original paper can reach 0.6, while ours is only 0.5 at most. This may be because we have made changes to the code of the provided model part, which may be different from those used by the authors, causing the results to be skewed. At the same time, due to the limitations of experimental conditions, the settings of some parameters are different from those in the paper, such as the setting of batch size.
 
-![1649964191180](C:\Users\zhong201707030308\AppData\Roaming\Typora\typora-user-images\1649964191180.png)
+![1649964191180](figures\major.jpeg)
 
 ```
 Figure 4 The performance on the test dataset with three different fusion methods by using the majority vote.
@@ -210,7 +210,7 @@ Then, we adopted the mean rule to deal with the relevance score. The experimenta
 
 It is also worth noting that in the paper, the authors found that the fusion method of multiplication is optimal compared to the others, and our experiments show that the fusion method of concatenation is optimal. This may be because in the implementation of the concatenation method, we added another linear layer and introduced more learning parameters, so that the model is more flexible and can capture more general features.
 
-![1649964170923](C:\Users\zhong201707030308\AppData\Roaming\Typora\typora-user-images\1649964170923.png)
+![1649964170923](figures\mean.jpeg)
 
 ```
 Figure 5 The performance on the test dataset with three different fusion methods by using the mean rule.
