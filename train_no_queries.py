@@ -21,6 +21,8 @@ from urllib import  parse
 import numpy as np
 from torch.nn.utils.rnn import  pad_sequence
 
+import warnings
+
 
 
 # Define the transform
@@ -48,6 +50,45 @@ test_transform = transforms.Compose([
     ])
 
 
+def preprocessing(query_path):
+    """
+    query_path : path of the annoation csv file
+    return the DataFrame type data
+
+    """
+    query_data = pd.read_csv(query_path)
+
+    query_expand = query_data
+    queries = query_data.iloc[:, 0]
+    queries = queries.drop_duplicates()
+    for index, query in enumerate(queries):
+
+        q_data = query_data.loc[query_data["query"] == query]
+        start_index = q_data.index.tolist()[0]
+        last_index = q_data.index.tolist()[-1]
+
+        len_q = len(q_data)
+
+        if len_q < 199:
+            diff_len = 199 - len_q
+            num_iter = int(199 / len_q)
+            if diff_len > len_q:
+                added_length = len_q
+            else:
+                added_length = diff_len
+            count = 0
+            for j in range(num_iter):
+                for i in range(added_length):
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+                        query_expand = query_expand.append(query_data.iloc[i + start_index, :], ignore_index=True)
+                    count += 1
+                    if len_q + count == 199:
+                        break
+
+    return query_expand
+
+
 class dataset(Dataset):
 
     def __init__(self, csv_file, root_dir, img_dir, transform=None):
@@ -59,7 +100,7 @@ class dataset(Dataset):
                 on a sample.
         """
 
-        self.query_frame_train = pd.read_csv(csv_file)
+        self.query_frame_train = preprocessing(csv_file)
         self.root_dir = root_dir
         self.transform = transform
         self.img_dir = img_dir
@@ -71,18 +112,8 @@ class dataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        # img_url = os.path.join(self.root_dir,
-        #                        self.query_frame_train.iloc[idx, 2].split("/")[
-        #                            len(self.query_frame_train.iloc[idx, 2].split("/")) - 2],
-        #                        self.query_frame_train.iloc[idx, 2].split("/")[
-        #                            len(self.query_frame_train.iloc[idx, 2].split("/")) - 1])
-
         img_name = self.query_frame_train.iloc[idx,2].split("/")[-2] + self.query_frame_train.iloc[idx,2].split("/")[-1]
         img_path = self.img_dir + '/' + img_name
-
-        #         # get correct url
-        #         img_name=img_name.replace('\\', '/')
-        #         img_name=parse.quote(img_name,':?=/')
 
         image = io.imread(img_path)
         query = self.query_frame_train.iloc[idx, 0]
@@ -99,9 +130,7 @@ class dataset(Dataset):
         return sample
 
 
-
 import gensim
-from t2i import T2I
 from nltk.tokenize import word_tokenize
 # import nltk
 # # nltk.data.path.append("F:/Anaconda/Lib/site-packages/nltk_data")
@@ -116,7 +145,6 @@ def embedding_model():
     queries_train = pd.read_csv('query-VS/dataset/videos/video_name_train.csv', engine='python')
     queries_val = pd.read_csv('query-VS/dataset/videos/video_name_val.csv', engine='python')
 
-
     # Stack train/val/test queries together
     df_queries = pd.concat([queries_train, queries_val, queries_test], axis=0)
     queries = df_queries.values.tolist()
@@ -124,14 +152,9 @@ def embedding_model():
     # Tokenize
     token = [word_tokenize(q[0]) for q in queries]
 
-    # Build the dictionary
-    word_index = T2I.build(token)
-
     # Build word2vec model
     model = gensim.models.Word2Vec(token, min_count=1)
     print(model)
-    # summarize vocabulary
-    words = list(model.wv.key_to_index)
     return model
 
 
@@ -178,7 +201,7 @@ class QVSmodel(nn.Module):
         self.fc_text1 = torch.nn.Linear(8, 1)
         self.fc_text2 = torch.nn.Linear(100, 512)
 
-    def forward(self, x):
+    def forward(self, x, y):
         x = self.model.conv1(x)
         x = self.model.bn1(x)
         x = self.model.relu(x)
@@ -290,7 +313,7 @@ def test(test_loader, model, criterion, device):
     return avg_loss / len(test_loader), count_relevance
 
 
-def run(train_dataset,test_dataset,epochs =1):
+def run(train_dataset, val_dataset, train_loader, val_loader, epochs=5):
     """
 
 
@@ -307,11 +330,13 @@ def run(train_dataset,test_dataset,epochs =1):
     # Create loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model_qvs.parameters(), 0.0001)
+    #     optimizer = Over9000(model_qvs.parameters(), lr=1e-4)
 
     # Use GPU if available
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     model_qvs = model_qvs.to(device)
+    #     early_stopping = EarlyStopping(patience=10 ,verbose=True)
 
     for epoch in tqdm(range(epochs)):
         # Train on data
@@ -322,44 +347,55 @@ def run(train_dataset,test_dataset,epochs =1):
                                         device)
 
         # Test on data
-        test_loss, test_count = test(test_loader,
-                                     model_qvs,
-                                     criterion,
-                                     device)
+        val_loss, val_count = test(val_loader,
+                                   model_qvs,
+                                   criterion,
+                                   device)
 
-        train_acc_relevance = (float(train_count) / len(train_dataset))
-        test_acc_relevance = (float(test_count) / len(test_dataset) )
+        train_acc_relevance = (float(train_count) / (len(train_dataset)))
+        val_acc_relevance = (float(val_count) / (len(val_dataset)))
 
-        # Write metrics to Tensorboard
-        print("Train loss: ", train_loss, "Test loss: ", test_loss)
-        print("Train acc: ", train_acc_relevance, "Test acc: ", test_acc_relevance)
+        print("Train loss: ", train_loss, "Valiation loss: ", val_loss)
+        print("Train acc: ", train_acc_relevance, "Valiation acc: ", val_acc_relevance)
         # Write metrics to Tensorboard
         writer.add_scalars('Loss', {
             'Train': train_loss,
-            'Test': test_loss
+            'Valiation': val_loss
         }, epoch)
         writer.add_scalars('Accuracy', {
             'Train': train_acc_relevance,
-            'Test': test_acc_relevance
+            'Valiation': val_acc_relevance
         }, epoch)
+    #         early_stopping(val_loss, model_qvs)
 
-    # torch.save(model_qvs, "models")
+    #         if early_stopping.early_stop:
+    #             print("Early stopping")
+    #             break
+
+    #     torch.save(model_qvs, "models")
 
     print('\nFinished.')
     writer.flush()
     writer.close()
+    return model_qvs
 
-train_path = "annotations/query_frame_annotations_train.csv"
-test_path = "annotations/query_frame_annotations_test.csv"
-val_path = "annotations/query_frame_annotations_val.csv"
+train_path = "annotations/query_frame_annotations_train_major.csv"
+test_path = "annotations/query_frame_annotations_test_major.csv"
+val_path = "annotations/query_frame_annotations_val_major.csv"
 root_dir = "https://data.vision.ee.ethz.ch/arunv/AMT_VideoFrames/"
 
 train_dataset = dataset(train_path, root_dir,'train_data', train_transform)
 test_dataset = dataset(test_path, root_dir, 'test_data',test_transform)
-# val_dataset = dataset(val_path, root_dir, valid_transform)
+val_dataset = dataset(val_path, root_dir, 'val_data', valid_transform)
 
+train_loader =  DataLoader(train_dataset, batch_size = 64, shuffle=True)
+test_loader =  DataLoader(test_dataset, batch_size = 64, shuffle=True)
+val_loader =  DataLoader(val_dataset, batch_size = 64, shuffle=True)
 
-train_loader =  DataLoader(train_dataset, batch_size = 8, shuffle=True)
-test_loader =  DataLoader(test_dataset, batch_size = 8, shuffle=True)
+model_qvs = run(train_dataset, val_dataset, train_loader, val_loader, epochs=25)
 
-run(train_dataset,test_dataset,epochs=1)
+criterion = nn.CrossEntropyLoss()
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+test_loss, test_count = test(test_loader,model_qvs,criterion,device)
+test_acc_relevance = (float(test_count) / (len(test_dataset)))
+print(test_acc_relevance)
