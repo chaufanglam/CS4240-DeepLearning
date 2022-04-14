@@ -94,7 +94,7 @@ def encode_queries(queries, model):
 
 ### Video summary generator
 
-![1649944158854](figures/model.jpeg)
+![1649944158854](https://github.com/chaufanglam/CS4240-DeepLearning/blob/main/figures/model.jpeg)
 
 						Figure 3 The structure of the video summary generator.
 
@@ -183,7 +183,7 @@ We use Google Cloud Platform to set up a virtual machine, and we use 1 x NVIDIA 
 
 We first took the majority rule on the data and trained the model for 25 epochs. The change in the accuracy of the training set and the accuracy of the validation set is shown in the figure below, which shows the same pattern as the change of the accuracy in the paper. When the number of epoch increases, the training accuracy keeps improving, while the validation set accuracy even decreases slightly, and the model appears to be overfitting. At the same time, the accuracy of the validation set is small compared to the accuracy in the paper, only about 0.45.
 
-![1649964191180](figures\model_performance.png)
+![1649964191180](https://github.com/chaufanglam/CS4240-DeepLearning/blob/main/figures/model_performance.png)
 
 Comparing the results of Fig1 to Figure 5 from the paper, we see that our model converges to the final result in less epochs compared to the original paper. This is beneficial, as it allows us to get a good result in less epochs. However, looking at the final results, we see a slightly larger difference between the accuracy of the training and validation data. This indicates that our model slightly overfits when compared to the original paper.
 
@@ -197,7 +197,7 @@ We first process the relevance scores of the data with the majority rule, and tr
 
 There is a certain gap between this accuracy and the original paper. The accuracy of the original paper can reach 0.6, while ours is only 0.5 at most. This may be because we have made changes to the code of the provided model part, which may be different from those used by the authors, causing the results to be skewed. At the same time, due to the limitations of experimental conditions, the settings of some parameters are different from those in the paper, such as the setting of batch size.
 
-![1649964191180](figures\major.jpeg)
+![1649964191180](https://github.com/chaufanglam/CS4240-DeepLearning/blob/main/figures/major.jpeg)
 
 ```
 Figure 4 The performance on the test dataset with three different fusion methods by using the majority vote.
@@ -210,7 +210,7 @@ Then, we adopted the mean rule to deal with the relevance score. The experimenta
 
 It is also worth noting that in the paper, the authors found that the fusion method of multiplication is optimal compared to the others, and our experiments show that the fusion method of concatenation is optimal. This may be because in the implementation of the concatenation method, we added another linear layer and introduced more learning parameters, so that the model is more flexible and can capture more general features.
 
-![1649964170923](figures\mean.jpeg)
+![1649964170923](https://github.com/chaufanglam/CS4240-DeepLearning/blob/main/figures/mean.jpeg)
 
 ```
 Figure 5 The performance on the test dataset with three different fusion methods by using the mean rule.
