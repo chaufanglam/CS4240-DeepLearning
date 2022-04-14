@@ -201,7 +201,7 @@ class QVSmodel(nn.Module):
         self.fc_text1 = torch.nn.Linear(8, 1)
         self.fc_text2 = torch.nn.Linear(100, 512)
 
-    def forward(self, x, y):
+    def forward(self, x):
         x = self.model.conv1(x)
         x = self.model.bn1(x)
         x = self.model.relu(x)
