@@ -4,6 +4,10 @@ Group 46 :
 
 Bingxiang Zhong (5449014) B.Zhong@student.tudelt.nl
 
+Chaufang Lin (5466091) Z.Lin-7@student.tudelft.nl
+
+Angelos Zoumis 
+
 ## Introduction
 
 Today, videos are integral way of exchanging and providing information. However, they are also extremely time consuming, as very often, they can contain redundant or useless information. Therefore, many video summarization algorithms have been created, that produce a fraction of the original file, by capturing only the essence of the video[1]. However, existing video summarization methods [2] produce a single fixed video, when what essential can change based on the user and the video. In order to address this problem, the research paper “Query-controllable video summarization” from Jia-Hong Huang and Marcel Worring designs a video summarization algorithm that takes a text-based query as an input before creating the video summary. Our goal in this blog is to replicate the results from the research paper, as well as adding additional features, like a new word embedding, and testing on new data.
