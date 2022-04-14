@@ -34,7 +34,7 @@ Since the duration of each video is different, the number of the corresponding f
 
 ![1649941564776](https://github.com/chaufanglam/CS4240-DeepLearning/blob/main/figures/video_num.jpeg)
 
-						Figure 1 The original number of frames of videos. 
+​					Figure 1 The original number of frames of videos. 
 
 ### Majority Vote
 
@@ -58,7 +58,7 @@ The proposed method query controllable video summarization consists of a video s
 
 ![1649944918229](https://github.com/chaufanglam/CS4240-DeepLearning/blob/main/figures/flow.jpeg)
 
-			Figure 2 The flow chart of the query controllable video summarization model.
+​		Figure 2 The flow chart of the query controllable video summarization model.
 
 ### Video summary controller
 
@@ -100,7 +100,7 @@ def encode_queries(queries, model):
 
 ![1649944158854](https://github.com/chaufanglam/CS4240-DeepLearning/blob/main/figures/model.jpeg)
 
-						Figure 3 The structure of the video summary generator.
+​					Figure 3 The structure of the video summary generator.
 
 The video summary generator is composed of a convolutional neural network (CNN) structure and a multi-modality features fusion module. The CNN structure is used to extract features from the images, and it is based on the pretrained ResNet-34. By feeding an image of size 1x3x224x224 into the CNN structure, features of size 1x512 will be extracted. 
 
@@ -189,7 +189,9 @@ We first took the majority rule on the data and trained the model for 25 epochs.
 
 ![1649964191180](https://github.com/chaufanglam/CS4240-DeepLearning/blob/main/figures/model_performance.png)
 
-Comparing the results of Fig1 to Figure 5 from the paper, we see that our model converges to the final result in less epochs compared to the original paper. This is beneficial, as it allows us to get a good result in less epochs. However, looking at the final results, we see a slightly larger difference between the accuracy of the training and validation data. This indicates that our model slightly overfits when compared to the original paper.
+​								Figure 4 Model performance
+
+Comparing the results from the paper, we see that our model converges to the final result in less epochs compared to the original paper. This is beneficial, as it allows us to get a good result in less epochs. However, looking at the final results, we see a slightly larger difference between the accuracy of the training and validation data. This indicates that our model slightly overfits when compared to the original paper.
 
 
 
@@ -203,9 +205,7 @@ There is a certain gap between this accuracy and the original paper. The accurac
 
 ![1649964191180](https://github.com/chaufanglam/CS4240-DeepLearning/blob/main/figures/major.jpeg)
 
-```
-Figure 4 The performance on the test dataset with three different fusion methods by using the majority vote.
-```
+Figure 5 The performance on the test dataset with three different fusion methods by using the majority vote.
 
 
 It is also worth noting that in the paper, the authors found that the fusion method of multiplication is optimal compared to the others, and our experiments show that the fusion method of concatenation is optimal. This may be because in the implementation of the concatenation method, we added another linear layer and introduced more learning parameters, so that the model is more flexible and can capture more general features.
@@ -216,9 +216,7 @@ It is also worth noting that in the paper, the authors found that the fusion met
 
 ![1649964170923](https://github.com/chaufanglam/CS4240-DeepLearning/blob/main/figures/mean.jpeg)
 
-```
-Figure 5 The performance on the test dataset with three different fusion methods by using the mean rule.
-```
+Figure 6 The performance on the test dataset with three different fusion methods by using the mean rule.
 
 
 
